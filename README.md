@@ -1,6 +1,6 @@
 # minihltv-chrome-extension
-### A chrome extension to follow CS:GO Pro Teams.
-======
+A chrome extension to follow CS:GO Pro Teams.
+------
 _To Use:_
 1. Install [Nodejs](https://nodejs.org/en/)
 2. *npm i* to install dependencies .
