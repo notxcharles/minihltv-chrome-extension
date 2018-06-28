@@ -3,13 +3,13 @@ const {
 } = require(`hltv`)
 const countryCodes = require(`./countrycodes.json`)
 //const xyz = document.getElementById(`test`)
-const body = document.getElementById(`body`)
+// const body = document.getElementById(`body`)
 const liveMatches = []
 //This will be an array containing objects that will hold info about each team and match currently playing.
 let html = ``;
 window.onload = function () {
     chrome.extension.getBackgroundPage().console.log(`Chrome extension has been loaded.`)
-    body.innerHTML = `Chrome extension opened!`
+    // body.innerHTML = `Chrome extension opened!`
 
     HLTV.getMatches() //Get a list of the current matches on hltv.org/matches
         .then((matches) => {
@@ -81,7 +81,7 @@ window.onload = function () {
 
                                         //Add all the existing information to the extension for now.
                                         //xyz.innerHTML = JSON.stringify(liveMatches);
-                                        body.innerHTML += `<div class="match-preview">${JSON.stringify(matchObj)}</div>`
+                                        //body.innerHTML += `<div class="match-preview">${JSON.stringify(matchObj)}</div>`
                                     })
 
                             })
