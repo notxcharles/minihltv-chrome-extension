@@ -6,4 +6,4 @@ _To Use:_
 2. *npm i* to install dependencies .
 3. *npm i browserify -g* to install browserify
 4. *browserify app.js -o bundle.js* to create bundle.js
-5. Open in *chrome://extensions/* in chrome, enable developer mode, and click *load unpacked*  
+5. Open *chrome://extensions/*  in chrome, enable developer mode, and click *load unpacked*  
