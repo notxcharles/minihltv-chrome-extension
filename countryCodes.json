@@ -973,5 +973,9 @@
     {
         "name": "Zimbabwe",
         "code": "ZW"
+    },
+    {
+        "name": "North America",
+        "code": "NAM"
     }
 ]

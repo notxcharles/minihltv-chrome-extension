@@ -2,3 +2,4 @@ node_modules/
 test_jsons/
 bundle.js
 README.md
+compiled_background.js
