@@ -5,22 +5,19 @@ const countryCodes = require(`./countryCodes.json`)
 // const fs = require(`fs`)
 const trackedLiveMatches = [] //This array contains all of the matches that we are currently following.
 const liveMatches = [] //This array contains all the ids of live matches
-
+getLiveMatches();
+setInterval(getLiveMatches, 60000)
 
 chrome.extension.onConnect.addListener(port => {
     console.log(`Extension has been opened.`)
-    port.onMessage.addListener(msg => { // When a message is recieved from client, resend matches
-        console.log(`Message From Ext - ${msg}`)
-        port.postMessage(trackedLiveMatches)
-    })
     port.postMessage(trackedLiveMatches)
+    setInterval(function(){
+        port.postMessage(trackedLiveMatches)
+        console.log(`SENDINGSENDING!`)
+    }, 10000)
 })
-
-getLiveMatches();
-setInterval(getLiveMatches, 10000)
-
 function getLiveMatches() {
-    console.log(`livem`)
+    console.log(`livem = ${JSON.stringify(trackedLiveMatches)}`)
     HLTV.getMatches()
         .then((matches) => {
             for (let i = 0; i < matches.length; i++) {
@@ -50,17 +47,18 @@ function getLiveMatches() {
                         scoreBot();
                         liveMatches.push(matches[i].id)
                         console.log(liveMatches)
-                        if (matches.length - 1 == i) {
-                            //Final loop, get extra info.
-                            getLiveMatchInfo();
-                        }
+                        
                     } else {
                         //Live match is already being tracked
                         console.log(`b`)
                     }
 
                 }
-
+                if (i == matches.length-1) {
+                    console.log(`final loop`)
+                    //Final loop, get extra info.
+                    getLiveMatchInfo();
+                }
             }
         })
 }
@@ -85,6 +83,7 @@ function getLiveMatchInfo() {
                     let oneMap = matchObj.maps[i]
                     if (oneMap.result == "") {
                         //Match hasn't finished.
+                        oneMap.result = ""
                     } else {
                         //Match has finished
                         oneMap.result = oneMap.result.split(" ")[0]
@@ -96,17 +95,18 @@ function getLiveMatchInfo() {
 
 function getTeamInfo(teamid, i, teamnumber) {
     console.log(`getTeamI called`)
-    if (teamid == trackedLiveMatches[i][`team${teamnumber}`].teamid) console.log(`cool`)
-    else console.log(`nicht`)
+    // if (teamid == trackedLiveMatches[i][`team${teamnumber}`].teamid) console.log(`cool`)
+    // else console.log(`nicht`)
+    const matchObj = trackedLiveMatches[i]
     HLTV.getTeam({
             id: teamid
         })
         .then((ateam) => {
-            matchObj.team1.logo = teamA.logo
+            matchObj.team1.logo = ateam.logo
             //We need to convert the location to a country code.
             for (let v = 0; v < countryCodes.length; v++) {
                 if (countryCodes[v].name.toLowerCase() == ateam.location.toLowerCase()) {
-                    matchObj.team1.countrycode = countryCodes[v].code
+                    matchObj[`team${teamnumber}`].countrycode = countryCodes[v].code
                     break; //No need to keep looking for a match if we found one.
                 }
             }
@@ -176,24 +176,25 @@ function scoreBot() {
                 }
                 let currentMap;
                 for (let v = 0; v < matchObj.maps.length; v++) {
-                    if (matchObj.maps[v].name.toLowerCase() == shortMapName.toLowerCase()) {
+                    if (matchObj.maps[v].name == shortMapName) {
                         currentMap = v;
+                        const ctTeam = sb.ctTeamName;
+                        const tTeam = sb.terroristTeamName;
+                        const ctScore = sb.ctTeamScore;
+                        const tScore = sb.tTeamScore;
+                        console.log(`${ctTeam}: ${ctScore} | ${tTeam}: ${tScore}`)
+                        if (ctTeam == matchObj.team1.teamname) {
+                            let formattedScore = `${ctScore}:${tScore}`
+
+                            matchObj.maps[currentMap].result = formattedScore
+                        } else {
+                            let formattedScore = `${tScore}:${ctScore}`
+                            matchObj.maps[currentMap].result = formattedScore
+                        }
                         break;
                     }
                 }
-                let ctTeam = sb.ctTeamName;
-                let tTeam = sb.terroristTeamName;
-                let ctScore = sb.ctTeamScore;
-                let tScore = sb.tTeamScore;
-                console.log(`${ctTeam}: ${ctScore} | ${tTeam}: ${tScore}`)
-                if (ctTeam == matchObj.team1.teamname) {
-                    let formattedScore = `${ctScore}:${tScore}`
 
-                    matchObj.maps[currentMap].result = formattedScore
-                } else {
-                    let formattedScore = `${tScore}:${ctScore}`
-                    matchObj.maps[currentMap].result = formattedScore
-                }
             }
         })
     }
