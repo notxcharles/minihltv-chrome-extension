@@ -1,112 +1,126 @@
 body {
-    margin: 0px;
-    padding: 0px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 13px;
+  margin: 0px;
+  padding: 0px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+}
+body {
+  margin: 0px !important;
 }
 
 .match-preview {
-    height: 120px;
-    width: 400px;
+  height: 120px;
+  width: 400px;
+  margin: 0;
 }
-
+.body2 {
+  width: 400px;
+}
 .team-box {
-    display: flex;
-    height: 100%;
+  display: flex;
+  height: 100%;
 }
 
 .team {
-    position: relative;
-    flex: 1 0 0;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-size: cover;
-    background-position: 50% 50%;
+  position: relative;
+  flex: 1 0 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-size: cover;
+  background-position: 50% 50%;
 }
 
 .middle {
-    flex: 1;
-    width: 33%;
+  flex: 1;
+  width: 33%;
 }
 
 .team-L {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    opacity: 0.3;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  opacity: 0.3;
 }
 
 .team-L-gradient {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    background: linear-gradient(to right, rgba(255, 255, 255,0.2), rgba(255, 255, 255, 1));
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 1)
+  );
 }
-.team-R{
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    opacity: 0.3;
+.team-R {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  opacity: 0.3;
 }
-.team-R-gradient{
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    background: linear-gradient(to left, rgba(255, 255, 255,0.2), rgba(255, 255, 255, 1));
+.team-R-gradient {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 1)
+  );
 }
-.logo{
-    height: 40px;
-    margin: auto;
+.logo {
+  height: 40px;
+  margin: auto;
 }
-.teamname{
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-    text-decoration: none;
+.teamname {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-decoration: none;
 }
-a{
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    height: 55%;
+a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 55%;
 }
-.eventdetails{
-    height: 55%;
+.eventdetails {
+  height: 55%;
 }
 .eventname {
-    font-size: 10px;
-    text-align: center;
+  font-size: 10px;
+  text-align: center;
 }
-.starttime{
-    font-weight: 700;
-    font-size: 12px;
-    text-align: center;
+.starttime {
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
 }
 
-.results-l{
-    text-align: right;
-    margin-right: 20px;
+.results-l {
+  text-align: right;
+  margin-right: 20px;
 }
-.results-r{
-    text-align: left;
-    margin-left: 20px;
+.results-r {
+  text-align: left;
+  margin-left: 20px;
 }
-.result{
-    height: 15%;
+.result {
+  height: 15%;
 }
-.maps{
-    text-align: center;
+.maps {
+  text-align: center;
 }
-.result-w{
-    color: green;
+.result-w {
+  color: green;
 }
-.result-l{
-    color: red;
+.result-l {
+  color: red;
 }
-.result-x{
-    color: grey;
-    font-style: italic;
+.result-x {
+  color: grey;
+  font-style: italic;
 }

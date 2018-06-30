@@ -4,7 +4,8 @@ const {
 const countryCodes = require(`./countryCodes.json`)
 // const fs = require(`fs`)
 const trackedLiveMatches = [] //This array contains all of the matches that we are currently following.
-const liveMatches = [] //This array contains all the ids of live matches
+const loggedMatches = [] //This array contains all the ids of live matches
+
 getLiveMatches();
 setInterval(getLiveMatches, 60000)
 
@@ -12,8 +13,10 @@ chrome.extension.onConnect.addListener(port => {
     console.log(`Extension has been opened.`)
     port.postMessage(trackedLiveMatches)
     setInterval(function(){
+        if (!port) return; //This might stop the loop when extension is closed?
         port.postMessage(trackedLiveMatches)
         console.log(`SENDINGSENDING!`)
+        console.log(`LoggedM: ${loggedMatches}`)
     }, 10000)
 })
 function getLiveMatches() {
@@ -22,7 +25,8 @@ function getLiveMatches() {
         .then((matches) => {
             for (let i = 0; i < matches.length; i++) {
                 if (matches[i].live) {
-                    if (liveMatches.indexOf(matches[i].id) == -1) {
+                    checkLoggedMatches(matches);
+                    if (loggedMatches.indexOf(matches[i].id) == -1) {
                         //The live match isnt already added.
                         console.log(`a`)
                         const liveMatch = matches[i]
@@ -45,8 +49,8 @@ function getLiveMatches() {
                         getTeamInfo(matchObj.team1.teamid, i, 1);
                         getTeamInfo(matchObj.team2.teamid, i, 2);
                         scoreBot();
-                        liveMatches.push(matches[i].id)
-                        console.log(liveMatches)
+                        loggedMatches.push(matches[i].id)
+                        console.log(loggedMatches)
                         
                     } else {
                         //Live match is already being tracked
@@ -116,29 +120,59 @@ function getTeamInfo(teamid, i, teamnumber) {
         })
 }
 
-setInterval(() => {
-    //console.log(`matches - ${JSON.stringify(trackedLiveMatches)}`)
-    /*
-    for (let i = 0; i < trackedLiveMatches.length; i++) {
-        let match = trackedLiveMatches[i]
-        //Lets replace the abrieviated map names with full name
-        for (let v = 0; v < match.maps.length; v++) {
-            switch (match.maps[v].name) {
-                case "inf":
-                    match.maps[v].name = "Inferno";
-                    break;
-                case "trn":
-                    match.maps[v].name = "Train";
-                    break;
-                case "cch":
-                    match.maps[v].name = "Cache";
-                    break;
+// setInterval(() => {
+//     //console.log(`matches - ${JSON.stringify(trackedLiveMatches)}`)
+//     /*
+//     for (let i = 0; i < trackedLiveMatches.length; i++) {
+//         let match = trackedLiveMatches[i]
+//         //Lets replace the abrieviated map names with full name
+//         for (let v = 0; v < match.maps.length; v++) {
+//             switch (match.maps[v].name) {
+//                 case "inf":
+//                     match.maps[v].name = "Inferno";
+//                     break;
+//                 case "trn":
+//                     match.maps[v].name = "Train";
+//                     break;
+//                 case "cch":
+//                     match.maps[v].name = "Cache";
+//                     break;
+//             }
+//         }
+//     }
+//     */
+//     //fs.writeFile(`./test_jsons/hltv/abcd.json`, JSON.stringify(trackedLiveMatches), `utf8`, () => {})
+// }, 1000)
+function checkLoggedMatches(matches){
+    let tempLiveM = []
+    let copyOfLoggedMatches = loggedMatches.slice()
+    for (let i = 0; i < matches.length; i++){
+        if (matches[i].live) tempLiveM.push(matches[i].id)
+        if (matches.length - 1 == i){
+            //Last run through
+            //tempLiveM
+            //loggedMatches
+            for (let v = 0; v < tempLiveM.length; v++){
+                let index = copyOfLoggedMatches.indexOf(tempLiveM[v]);
+                if (index > -1){
+                    //Match is actually live.
+                    copyOfLoggedMatches.splice(index, 1)
+                }
+                if (loggedMatches.length - 1 == v){
+                    if (copyOfLoggedMatches.length > 0){
+                        //There are some matches that are not live yet are being logged.
+                        for (let q = 0; q < copyOfLoggedMatches.length; q++){
+                            let matchid = copyOfLoggedMatches[q]
+                            for (let w = 0; w < trackedLiveMatches.length; w++){
+                                if (trackedLiveMatches[w].matchid == matchid) trackedLiveMatches.splice(w, 1);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-    */
-    //fs.writeFile(`./test_jsons/hltv/abcd.json`, JSON.stringify(trackedLiveMatches), `utf8`, () => {})
-}, 1000)
+}
 
 function scoreBot() {
     for (let i = 0; i < trackedLiveMatches.length; i++) {
@@ -182,7 +216,7 @@ function scoreBot() {
                         const tTeam = sb.terroristTeamName;
                         const ctScore = sb.ctTeamScore;
                         const tScore = sb.tTeamScore;
-                        console.log(`${ctTeam}: ${ctScore} | ${tTeam}: ${tScore}`)
+                        //console.log(`${ctTeam}: ${ctScore} | ${tTeam}: ${tScore}`) This spams console
                         if (ctTeam == matchObj.team1.teamname) {
                             let formattedScore = `${ctScore}:${tScore}`
 
