@@ -12,20 +12,21 @@ setInterval(getLiveMatches, 60000)
 chrome.extension.onConnect.addListener(port => {
     console.log(`Extension has been opened.`)
     port.postMessage(trackedLiveMatches)
-    setInterval(function(){
+    setInterval(function () {
         if (!port) return; //This might stop the loop when extension is closed?
         port.postMessage(trackedLiveMatches)
         console.log(`SENDINGSENDING!`)
         console.log(`LoggedM: ${loggedMatches}`)
     }, 10000)
 })
+
 function getLiveMatches() {
     console.log(`livem = ${JSON.stringify(trackedLiveMatches)}`)
     HLTV.getMatches()
         .then((matches) => {
             for (let i = 0; i < matches.length; i++) {
                 if (matches[i].live) {
-                    checkLoggedMatches(matches);
+
                     if (loggedMatches.indexOf(matches[i].id) == -1) {
                         //The live match isnt already added.
                         console.log(`a`)
@@ -51,17 +52,18 @@ function getLiveMatches() {
                         scoreBot();
                         loggedMatches.push(matches[i].id)
                         console.log(loggedMatches)
-                        
+
                     } else {
                         //Live match is already being tracked
                         console.log(`b`)
                     }
 
                 }
-                if (i == matches.length-1) {
+                if (i == matches.length - 1) {
                     console.log(`final loop`)
                     //Final loop, get extra info.
                     getLiveMatchInfo();
+                    checkLoggedMatches();
                 }
             }
         })
@@ -120,57 +122,28 @@ function getTeamInfo(teamid, i, teamnumber) {
         })
 }
 
-// setInterval(() => {
-//     //console.log(`matches - ${JSON.stringify(trackedLiveMatches)}`)
-//     /*
-//     for (let i = 0; i < trackedLiveMatches.length; i++) {
-//         let match = trackedLiveMatches[i]
-//         //Lets replace the abrieviated map names with full name
-//         for (let v = 0; v < match.maps.length; v++) {
-//             switch (match.maps[v].name) {
-//                 case "inf":
-//                     match.maps[v].name = "Inferno";
-//                     break;
-//                 case "trn":
-//                     match.maps[v].name = "Train";
-//                     break;
-//                 case "cch":
-//                     match.maps[v].name = "Cache";
-//                     break;
-//             }
-//         }
-//     }
-//     */
-//     //fs.writeFile(`./test_jsons/hltv/abcd.json`, JSON.stringify(trackedLiveMatches), `utf8`, () => {})
-// }, 1000)
-function checkLoggedMatches(matches){
-    let tempLiveM = []
-    let copyOfLoggedMatches = loggedMatches.slice()
-    for (let i = 0; i < matches.length; i++){
-        if (matches[i].live) tempLiveM.push(matches[i].id)
-        if (matches.length - 1 == i){
-            //Last run through
-            //tempLiveM
-            //loggedMatches
-            for (let v = 0; v < tempLiveM.length; v++){
-                let index = copyOfLoggedMatches.indexOf(tempLiveM[v]);
-                if (index > -1){
-                    //Match is actually live.
-                    copyOfLoggedMatches.splice(index, 1)
+function checkLoggedMatches() {
+    console.log(`check logged matches!`)
+    //To check if all our logged matches are live we will use HLTV.getmatch to check
+    for (let i = 0; i < trackedLiveMatches.length; i++) {
+        let matchObj = trackedLiveMatches[i]
+        HLTV.getMatch({
+                id: matchObj.matchid
+            })
+            .then((match) => {
+                if (match.live == true) {
+                    console.log(`---${matchObj.matchid} LIVE!!!!`)
+                } else {
+                    console.log(`---${matchObj.matchid} NOT LIVE!!!!`)
+                    //Match isn't live!
+                    let v = trackedLiveMatches.indexOf(matchObj);
+                    trackedLiveMatches.splice(v, 1);
+                    //Remove the match from the array.
+                    //Now we need to remove the match from the array of match ids
+                    let index = loggedMatches.indexOf(matchObj.matchid);
+                    if (index > -1) loggedMatches.splice(index, 1);
                 }
-                if (loggedMatches.length - 1 == v){
-                    if (copyOfLoggedMatches.length > 0){
-                        //There are some matches that are not live yet are being logged.
-                        for (let q = 0; q < copyOfLoggedMatches.length; q++){
-                            let matchid = copyOfLoggedMatches[q]
-                            for (let w = 0; w < trackedLiveMatches.length; w++){
-                                if (trackedLiveMatches[w].matchid == matchid) trackedLiveMatches.splice(w, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            })
     }
 }
 
